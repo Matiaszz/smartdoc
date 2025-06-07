@@ -4,7 +4,8 @@ import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
-import lombok.AllArgsConstructor;
+import dev.matias.smartDoc.Domain.Document;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
@@ -13,7 +14,8 @@ import java.io.ByteArrayInputStream;
 public class AzureStorageService {
     private final BlobContainerClient containerClient;
 
-    public AzureStorageService(String connectionString, String containerName){
+    public AzureStorageService(@Value("${azure.storage.connection-string}") String connectionString,
+                               @Value("${azure.storage.container-name}") String containerName){
         BlobServiceClient serviceClient = new BlobServiceClientBuilder()
                 .connectionString(connectionString).buildClient();
 
@@ -25,8 +27,8 @@ public class AzureStorageService {
 
     }
 
-    public void uploadFile(String fileName, byte[] data){
-        BlobClient blobClient = containerClient.getBlobClient(fileName);
-        blobClient.upload(new ByteArrayInputStream(data), data.length, true);
+    public void uploadFile(Document document){
+        BlobClient blobClient = containerClient.getBlobClient(document.getName());
+        blobClient.upload(new ByteArrayInputStream(document.getData()), document.getData().length, true);
     }
 }
