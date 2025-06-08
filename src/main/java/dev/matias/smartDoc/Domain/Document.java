@@ -4,7 +4,6 @@ import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
 
 import java.util.UUID;
 
@@ -12,7 +11,6 @@ import java.util.UUID;
 @Table(name="documents")
 @EqualsAndHashCode
 @AllArgsConstructor
-@NoArgsConstructor
 @Data
 public class Document {
     @Id
@@ -22,7 +20,17 @@ public class Document {
     @Enumerated(EnumType.STRING)
     private DocType type;
     private String name;
+    private double size;
 
     @Lob
     private byte[] data;
+
+    public Document() {
+
+    }
+
+    public void setData(byte[] data) {
+        this.data = data;
+        this.size = (data != null) ? data.length : 0;
+    }
 }

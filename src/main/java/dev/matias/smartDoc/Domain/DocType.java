@@ -4,5 +4,6 @@ public enum DocType {
     PDF,
     DOCX,
     IMAGE,
+    PPTX,
     OTHER
 }
