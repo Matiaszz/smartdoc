@@ -6,11 +6,16 @@ import dev.matias.smartDoc.Repositories.DocumentRepository;
 import dev.matias.smartDoc.Services.AzureStorageService;
 import dev.matias.smartDoc.Services.DocumentService;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/documents")
@@ -21,24 +26,24 @@ public class DocumentController {
     private final AzureStorageService storageService;
     private final DocumentService documentService;
 
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
+
     @PostMapping("/upload")
-    public ResponseEntity<?> uploadFile(
-            @RequestParam("file") MultipartFile file
-    ) {
+    public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file) {
         try {
-            Document document = new Document();
-            document.setName(file.getOriginalFilename());
-            document.setType(documentService.getTypeEnum(document));
-            document.setData(file.getBytes());
-
-            documentRepository.save(document);
-
-            storageService.uploadFile(document);
-
-            return ResponseEntity.ok(new DocumentDTO(document));
+            Document savedDocument = documentService.prepareDocument(file);
+            storageService.uploadFile(savedDocument, file.getBytes());
+            return ResponseEntity.ok().body(new DocumentDTO(savedDocument, storageService.getMetadata(savedDocument)));
 
         } catch (IOException e) {
-            return ResponseEntity.status(500).body("Error in file process: " + e.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error on file processing: %s", e);
         }
     }
+
+    @GetMapping("/all")
+    public List<DocumentDTO> getAllDocuments(){
+        return storageService.getAllFiles();
+    }
+
 }

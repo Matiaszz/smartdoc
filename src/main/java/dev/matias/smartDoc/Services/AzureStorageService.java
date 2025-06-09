@@ -1,18 +1,44 @@
 package dev.matias.smartDoc.Services;
 
+import com.azure.core.http.rest.PagedIterable;
 import com.azure.storage.blob.BlobClient;
 import com.azure.storage.blob.BlobContainerClient;
 import com.azure.storage.blob.BlobServiceClient;
 import com.azure.storage.blob.BlobServiceClientBuilder;
+import com.azure.storage.blob.models.BlobItem;
+import com.azure.storage.blob.models.BlobListDetails;
+import com.azure.storage.blob.models.ListBlobsOptions;
+import dev.matias.smartDoc.DTOs.DocumentDTO;
+import dev.matias.smartDoc.Domain.DocType;
 import dev.matias.smartDoc.Domain.Document;
+import dev.matias.smartDoc.Repositories.DocumentRepository;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class AzureStorageService {
     private final BlobContainerClient containerClient;
+
+    @Autowired
+    private DocumentRepository documentRepository;
+
+    @Autowired
+    private DocumentService documentService;
+
+
 
     public AzureStorageService(@Value("${azure.storage.connection-string}") String connectionString,
                                @Value("${azure.storage.container-name}") String containerName){
@@ -27,8 +53,44 @@ public class AzureStorageService {
 
     }
 
-    public void uploadFile(Document document){
-        BlobClient blobClient = containerClient.getBlobClient(document.getName());
-        blobClient.upload(new ByteArrayInputStream(document.getData()), document.getData().length, true);
+    public void uploadFile(Document document, byte[] data){
+        String uniqueBlobName = document.getId().toString() + "_" + document.getName();
+        BlobClient blobClient = containerClient.getBlobClient(uniqueBlobName);
+        blobClient.upload(new ByteArrayInputStream(data), data.length, true);
+
+        HashMap<String, String> metadata = new HashMap<>();
+        metadata.put("documentId", String.valueOf(document.getId()));
+        // metadata.put("userId", "userId in the future");
+        blobClient.setMetadata(metadata);
     }
+
+    public List<DocumentDTO> getAllFiles() {
+        PagedIterable<BlobItem> blobs = containerClient.listBlobs(
+                new ListBlobsOptions().setDetails(new BlobListDetails().setRetrieveMetadata(true)),
+                null);
+
+        return blobs.stream()
+                .map(this::convertBlobItemToDocument)
+                .map(doc -> new DocumentDTO(doc, getMetadata(doc)))
+                .collect(Collectors.toList());
+    }
+
+
+    public Map<String, String> getMetadata(Document document) {
+        return containerClient.getBlobClient(document.getBlobName()).getProperties().getMetadata();
+    }
+
+    private Document convertBlobItemToDocument(BlobItem item) {
+        String documentIdStr = item.getMetadata() != null ? item.getMetadata().get("documentId") : null;
+        UUID documentId = (documentIdStr != null) ? UUID.fromString(documentIdStr) : null;
+
+        if (documentIdStr == null){
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "ID not casted");
+        }
+
+        return documentRepository.findById(documentId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Document ID not found."));
+    }
+
+
 }
