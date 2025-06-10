@@ -57,12 +57,35 @@ SETUPS
 
 - Error handling added via ResponseStatusException
 
-# 🔜 Next Steps (Sprint 2 Preview)
-- Document deletion
+# 🎯 Sprint 2 Goals (AI-enhanced version)
+## 🎨 1. Develop FastAPI Service for Automated Document Generation (Python)
+- Create a REST API using FastAPI to handle document automation tasks.
 
-- User authentication (possibly via Spring Security)
+- Receive JSON POST request containing a prompt/text request.
 
-- Azure Blob metadata updates
+- Use AI model (OpenAI GPT-4o or local model) to generate text based on the prompt.
 
-- Frontend integration (React)
+- Generate a PDF file from the generated text using WeasyPrint or FPDF.
 
+- Save the PDF file temporarily on the disk for further processing.
+
+## 🔗 2. Integrate FastAPI with Spring Boot Backend
+- Send the generated PDF file from FastAPI to Spring Boot's /api/documents/upload/ endpoint using an HTTP POST request (multipart/form-data).
+
+- Test local communication (localhost:8080).
+
+- Validate if the uploaded document reaches Azure Blob Storage successfully (visible via /all/).
+
+- ☁️ 3. Spring Boot Backend Improvements (if needed)
+- Ensure /upload/ endpoint accepts requests sent from FastAPI.
+
+- Handle "AI-generated" uploads properly:
+
+- Fixed or auto-generated metadata (e.g., source = FastAPI-AI).
+
+- Verify documents received via FastAPI appear correctly in the /all/ endpoint list.
+
+## ✅ 4. Testing & Validation
+- Test complete flow: FastAPI → Spring Boot → Azure Blob Storage → GET via Frontend/Postman.
+
+- Confirm document availability and proper download via /download/{id}/.
