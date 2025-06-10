@@ -2,23 +2,19 @@ package dev.matias.smartDoc.Controllers;
 
 import dev.matias.smartDoc.DTOs.DocumentDTO;
 import dev.matias.smartDoc.Domain.Document;
-import dev.matias.smartDoc.Repositories.DocumentRepository;
 import dev.matias.smartDoc.Services.AzureStorageService;
 import dev.matias.smartDoc.Services.DocumentService;
 import dev.matias.smartDoc.Services.RepositoriesServices;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
 @RestController
@@ -30,8 +26,6 @@ public class DocumentController {
     private final AzureStorageService storageService;
     private final DocumentService documentService;
 
-    @Autowired
-    private JdbcTemplate jdbcTemplate;
 
     @PostMapping("/upload/")
     public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file) {

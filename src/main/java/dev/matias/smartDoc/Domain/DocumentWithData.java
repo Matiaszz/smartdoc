@@ -1,6 +1,5 @@
 package dev.matias.smartDoc.Domain;
 
-import jakarta.persistence.Column;
 import lombok.Data;
 
 import java.util.UUID;
