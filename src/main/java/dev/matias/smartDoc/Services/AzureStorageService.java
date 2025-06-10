@@ -9,18 +9,18 @@ import com.azure.storage.blob.models.BlobItem;
 import com.azure.storage.blob.models.BlobListDetails;
 import com.azure.storage.blob.models.ListBlobsOptions;
 import dev.matias.smartDoc.DTOs.DocumentDTO;
-import dev.matias.smartDoc.Domain.DocType;
 import dev.matias.smartDoc.Domain.Document;
-import dev.matias.smartDoc.Repositories.DocumentRepository;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,10 +33,7 @@ public class AzureStorageService {
     private final BlobContainerClient containerClient;
 
     @Autowired
-    private DocumentRepository documentRepository;
-
-    @Autowired
-    private DocumentService documentService;
+    private RepositoriesServices repositoriesServices;
 
 
 
@@ -75,6 +72,13 @@ public class AzureStorageService {
                 .collect(Collectors.toList());
     }
 
+    public ByteArrayResource downloadFile(Document document){
+        BlobClient file = containerClient.getBlobClient(document.getBlobName());
+
+        byte[] fileContent = file.downloadContent().toBytes();
+
+        return new ByteArrayResource(fileContent);
+    }
 
     public Map<String, String> getMetadata(Document document) {
         return containerClient.getBlobClient(document.getBlobName()).getProperties().getMetadata();
@@ -88,8 +92,7 @@ public class AzureStorageService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "ID not casted");
         }
 
-        return documentRepository.findById(documentId).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Document ID not found."));
+        return repositoriesServices.getDocumentById(documentId);
     }
 
 

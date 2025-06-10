@@ -1,20 +1,27 @@
 package dev.matias.smartDoc.Services;
 
 
+import dev.matias.smartDoc.DTOs.DocumentDTO;
 import dev.matias.smartDoc.Domain.DocType;
 import dev.matias.smartDoc.Domain.Document;
 import dev.matias.smartDoc.Repositories.DocumentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Arrays;
+import java.util.UUID;
 
 
 @Service
 public class DocumentService {
     @Autowired
     private DocumentRepository documentRepository;
+
+    @Autowired
+    private AzureStorageService storage;
 
 
     public DocType getTypeEnum(String fileName){
@@ -36,6 +43,10 @@ public class DocumentService {
         }
 
         return DocType.OTHER;
+    }
+
+    public DocumentDTO getDocumentDTO(Document document){
+        return new DocumentDTO(document, storage.getMetadata(document));
     }
 
     public Document prepareDocument(MultipartFile file){

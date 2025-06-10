@@ -5,8 +5,10 @@ import dev.matias.smartDoc.Domain.Document;
 import dev.matias.smartDoc.Repositories.DocumentRepository;
 import dev.matias.smartDoc.Services.AzureStorageService;
 import dev.matias.smartDoc.Services.DocumentService;
+import dev.matias.smartDoc.Services.RepositoriesServices;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -16,20 +18,22 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/api/documents")
 @AllArgsConstructor
 public class DocumentController {
 
-    private final DocumentRepository documentRepository;
+    private final RepositoriesServices repositoriesServices;
     private final AzureStorageService storageService;
     private final DocumentService documentService;
 
     @Autowired
     private JdbcTemplate jdbcTemplate;
 
-    @PostMapping("/upload")
+    @PostMapping("/upload/")
     public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file) {
         try {
             Document savedDocument = documentService.prepareDocument(file);
@@ -41,7 +45,18 @@ public class DocumentController {
         }
     }
 
-    @GetMapping("/all")
+    @GetMapping("/download/{id}/")
+    public ResponseEntity<ByteArrayResource> downloadFile(@PathVariable UUID id) {
+        Document document = repositoriesServices.getDocumentById(id);
+
+        ByteArrayResource resource = storageService.downloadFile(document);
+
+        return ResponseEntity.ok()
+                .header("Content-Disposition", "attachment; filename=\"" + document.getName() + "\"")
+                .body(resource);
+    }
+
+    @GetMapping("/all/")
     public List<DocumentDTO> getAllDocuments(){
         return storageService.getAllFiles();
     }
