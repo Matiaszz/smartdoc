@@ -35,7 +35,7 @@ It enables users to upload, store, list, and download documents securely from th
 SETUPS
 ----------------------------
 - Remove "-example" from the following files: *docker-compose* and *application* files;
-- Overwrite with your personal configuration (such as Azure keys, DB credentials, etc);
+- Overwrite with your personal configuration (such as Azure keys, DB credentials, etc...);
 - Ensure Docker is running;
 - Required Tools:
   - Java 17+
