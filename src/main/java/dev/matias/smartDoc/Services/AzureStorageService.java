@@ -49,14 +49,18 @@ public class AzureStorageService {
     }
 
     public void uploadFile(Document document, byte[] data){
-        String uniqueBlobName = document.getId().toString() + "_" + document.getName();
-        BlobClient blobClient = containerClient.getBlobClient(uniqueBlobName);
+        BlobClient blobClient = getBlobClient(document);
         blobClient.upload(new ByteArrayInputStream(data), data.length, true);
 
         HashMap<String, String> metadata = new HashMap<>();
         metadata.put("documentId", String.valueOf(document.getId()));
         // metadata.put("userId", "userId in the future");
         blobClient.setMetadata(metadata);
+    }
+
+    public void deleteFile(Document document){
+        BlobClient blobClient = getBlobClient(document);
+        blobClient.deleteIfExists();
     }
 
     public List<DocumentDTO> getAllFiles() {
@@ -91,6 +95,11 @@ public class AzureStorageService {
         }
 
         return repositoriesServices.getDocumentById(documentId);
+    }
+
+    private BlobClient getBlobClient(Document document){
+        String uniqueBlobName = document.getBlobName();
+        return containerClient.getBlobClient(uniqueBlobName);
     }
 
 

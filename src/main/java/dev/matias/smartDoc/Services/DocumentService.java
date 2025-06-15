@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Arrays;
+import java.util.UUID;
 
 
 @Service
@@ -19,6 +20,15 @@ public class DocumentService {
 
     @Autowired
     private AzureStorageService storage;
+
+    @Autowired
+    private RepositoriesServices repositoriesServices;
+
+    public void deleteDocument(UUID id){
+        Document document = repositoriesServices.getDocumentById(id);
+        documentRepository.delete(document);
+        storage.deleteFile(document);
+    }
 
 
     public DocType getTypeEnum(String fileName){

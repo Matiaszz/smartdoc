@@ -108,4 +108,16 @@ async def generate_contract(contract: Contract):
         return Response(content="Failed to generate PDF.",
                         media_type="text/plain", status_code=500)
 
+    pdf_file = io.BytesIO(pdf_bytes)
+
+    files = {
+        'file': ('contract.pdf', pdf_file, 'application/pdf')
+    }
+
+    response = requests.post(
+        'http://localhost:8080/api/documents/upload/', files=files)
+
+    print(response.status_code)
+    print(response.text)
+
     return Response(content=pdf_bytes, media_type="application/pdf")

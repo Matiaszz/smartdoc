@@ -39,6 +39,12 @@ public class DocumentController {
         }
     }
 
+    @DeleteMapping("/{id}/")
+    public ResponseEntity<Void> deleteById(@PathVariable UUID id){
+        documentService.deleteDocument(id);
+        return ResponseEntity.ok().build();
+    }
+
     @GetMapping("/download/{id}/")
     public ResponseEntity<ByteArrayResource> downloadFile(@PathVariable UUID id) {
         Document document = repositoriesServices.getDocumentById(id);
