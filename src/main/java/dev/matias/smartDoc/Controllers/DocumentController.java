@@ -51,6 +51,14 @@ public class DocumentController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/{id}/")
+    public ResponseEntity<DocumentDTO> getDocument(@PathVariable UUID id){
+        Document document = repositoriesServices.getDocumentById(id);
+        return ResponseEntity.ok().body(
+                new DocumentDTO(document, storageService.getMetadata(document))
+        );
+    }
+
     @GetMapping("/download/{id}/")
     public ResponseEntity<ByteArrayResource> downloadFile(@PathVariable UUID id) {
         Document document = repositoriesServices.getDocumentById(id);
