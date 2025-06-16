@@ -5,6 +5,7 @@ import dev.matias.smartDoc.Domain.Document;
 import dev.matias.smartDoc.Services.AzureStorageService;
 import dev.matias.smartDoc.Services.DocumentService;
 import dev.matias.smartDoc.Services.RepositoriesServices;
+import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
@@ -26,7 +27,9 @@ public class DocumentController {
     private final AzureStorageService storageService;
     private final DocumentService documentService;
 
-
+    @Operation(
+            summary = "Upload a file to azure Storage",
+            description = "Accepts any file with a max size of 10MB and send to cloud.")
     @PostMapping("/upload/")
     public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file) {
         try {
@@ -44,13 +47,17 @@ public class DocumentController {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error on file processing: %s", e);
         }
     }
-
+    @Operation(
+            summary = "Delete a file from azure and DB",
+            description = "You must provide the document ID to proceed with the file deletion")
     @DeleteMapping("/{id}/")
     public ResponseEntity<Void> deleteById(@PathVariable UUID id){
         documentService.deleteDocument(id);
         return ResponseEntity.ok().build();
     }
-
+    @Operation(
+            summary = "Get a document by ID",
+            description = "You must provide the document ID to get the document")
     @GetMapping("/{id}/")
     public ResponseEntity<DocumentDTO> getDocument(@PathVariable UUID id){
         Document document = repositoriesServices.getDocumentById(id);
@@ -58,7 +65,9 @@ public class DocumentController {
                 new DocumentDTO(document, storageService.getMetadata(document))
         );
     }
-
+    @Operation(
+            summary = "Make the download of the specified file",
+            description = "You must provide the document ID to do the download of the specified document")
     @GetMapping("/download/{id}/")
     public ResponseEntity<ByteArrayResource> downloadFile(@PathVariable UUID id) {
         Document document = repositoriesServices.getDocumentById(id);
@@ -69,7 +78,6 @@ public class DocumentController {
                 .header("Content-Disposition", "attachment; filename=\"" + document.getName() + "\"")
                 .body(resource);
     }
-
     @GetMapping("/all/")
     public List<DocumentDTO> getAllDocuments(){
         return storageService.getAllFiles();
