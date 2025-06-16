@@ -72,16 +72,12 @@ public class DocumentService {
     }
 
     public void validateDocument(Document document){
-        List<String> errors = new ArrayList<>();
+        if (document.getType() == DocType.OTHER){
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Unsupported file type.");
+        }
 
         if (document.getName().trim().isEmpty()){
-            errors.add("Document name ");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Document name is required.");
         }
-
-        if (!errors.isEmpty()){
-            String msg = errors.stream().map(e -> "Error: " + e + "\n").toString();
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, msg);
-        }
-
     }
 }
