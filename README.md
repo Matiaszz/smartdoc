@@ -63,11 +63,7 @@ SETUPS
 
 - Receive JSON POST request containing a prompt/text request.
 
-- Use AI model (OpenAI GPT-4o or local model) to generate text based on the prompt.
-
-- Generate a PDF file from the generated text using WeasyPrint or FPDF.
-
-- Save the PDF file temporarily on the disk for further processing.
+- Generate a PDF file from the generated text using WeasyPrint.
 
 ## 🔗 2. Integrate FastAPI with Spring Boot Backend
 - Send the generated PDF file from FastAPI to Spring Boot's /api/documents/upload/ endpoint using an HTTP POST request (multipart/form-data).
@@ -76,10 +72,9 @@ SETUPS
 
 - Validate if the uploaded document reaches Azure Blob Storage successfully (visible via /all/).
 
-- ☁️ 3. Spring Boot Backend Improvements (if needed)
-- Ensure /upload/ endpoint accepts requests sent from FastAPI.
+## ☁️ 3. Spring Boot Backend Improvements (if needed)
 
-- Handle "AI-generated" uploads properly:
+- Ensure /upload/ endpoint accepts requests sent from FastAPI.
 
 - Fixed or auto-generated metadata (e.g., source = FastAPI-AI).
 

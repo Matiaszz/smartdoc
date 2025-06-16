@@ -6,10 +6,14 @@ import dev.matias.smartDoc.Domain.DocType;
 import dev.matias.smartDoc.Domain.Document;
 import dev.matias.smartDoc.Repositories.DocumentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.UUID;
 
 
@@ -65,5 +69,19 @@ public class DocumentService {
         doc = documentRepository.save(doc);
         documentRepository.flush();
         return doc;
+    }
+
+    public void validateDocument(Document document){
+        List<String> errors = new ArrayList<>();
+
+        if (document.getName().trim().isEmpty()){
+            errors.add("Document name ");
+        }
+
+        if (!errors.isEmpty()){
+            String msg = errors.stream().map(e -> "Error: " + e + "\n").toString();
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, msg);
+        }
+
     }
 }

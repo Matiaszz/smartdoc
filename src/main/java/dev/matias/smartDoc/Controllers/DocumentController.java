@@ -30,9 +30,15 @@ public class DocumentController {
     @PostMapping("/upload/")
     public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file) {
         try {
+
             Document savedDocument = documentService.prepareDocument(file);
+            documentService.validateDocument(savedDocument);
             storageService.uploadFile(savedDocument, file.getBytes());
-            return ResponseEntity.ok().body(new DocumentDTO(savedDocument, storageService.getMetadata(savedDocument)));
+
+            return ResponseEntity.ok().body(
+                    new DocumentDTO(savedDocument, storageService.getMetadata(savedDocument)
+                    )
+            );
 
         } catch (IOException e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error on file processing: %s", e);
