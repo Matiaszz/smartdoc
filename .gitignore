@@ -33,3 +33,10 @@ build/
 .vscode/
 compose.yaml
 *application.properties
+
+
+### Python ###
+python/.venv
+
+python/README.md
+python/src/__pycache__

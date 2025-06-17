@@ -1,17 +1,8 @@
-import weasyprint
-import requests
-import io
-from pydantic import BaseModel
-from fastapi import FastAPI, Response
-from typing import Literal
+# flake8:noqa
+from models.document import Document
 
 
-app = FastAPI()
-
-
-class Contract(BaseModel):
-    title: str
-    date: str
+class Contract(Document):
     contractor: str
     contracted: str
     key_terms_definitions: str
@@ -19,7 +10,6 @@ class Contract(BaseModel):
     payment_terms: str
     start_date: str
     contract_duration: str
-    lang: Literal['en', 'pt'] = 'en'  # 'en' = English, 'pt' = Portuguese
 
 
 def generate_contract_html(contract: Contract) -> str:
@@ -48,11 +38,11 @@ def generate_contract_html(contract: Contract) -> str:
             "signature": "Signature",
         }
 
-    return f"""
+    return f""" 
     <html>
     <head>
         <style>
-            body {{ font-family: 'Helvetica', sans-serif; margin: 40px; color: #333; }}
+            body {{ font-family: 'Helvetica', sans-serif; margin: 40px; color: #333; }} 
             header {{ text-align: center; border-bottom: 2px solid #555; padding-bottom: 10px; margin-bottom: 30px; }}
             h1 {{ font-size: 28px; color: #222; }}
             section {{ margin-bottom: 25px; }}
@@ -97,27 +87,3 @@ def generate_contract_html(contract: Contract) -> str:
     </body>
     </html>
     """
-
-
-@app.post("/generate-contract-pdf")
-async def generate_contract(contract: Contract):
-    html_content = generate_contract_html(contract)
-    pdf_bytes = weasyprint.HTML(string=html_content).write_pdf()
-
-    if pdf_bytes is None:
-        return Response(content="Failed to generate PDF.",
-                        media_type="text/plain", status_code=500)
-
-    pdf_file = io.BytesIO(pdf_bytes)
-
-    files = {
-        'file': ('contract.pdf', pdf_file, 'application/pdf')
-    }
-
-    response = requests.post(
-        'http://localhost:8080/api/documents/upload/', files=files)
-
-    print(response.status_code)
-    print(response.text)
-
-    return Response(content=pdf_bytes, media_type="application/pdf")

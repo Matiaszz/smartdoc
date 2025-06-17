@@ -82,5 +82,4 @@ public class DocumentController {
     public List<DocumentDTO> getAllDocuments(){
         return storageService.getAllFiles();
     }
-
 }
