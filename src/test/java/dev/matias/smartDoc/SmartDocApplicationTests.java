@@ -42,10 +42,8 @@ class SmartDocApplicationTests {
 
 	private final String uri = "/api/documents/" + mockId + "/";
 
-	private final Document mockDocument = Document.builder()
-			.id(mockId)
-			.name("test.pdf")
-			.build();
+	private final Document mockDocument = new Document(mockId, "test.pdf");
+
 
 	@Test
 	void shouldGetAllDocuments() throws Exception {

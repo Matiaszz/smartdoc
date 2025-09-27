@@ -1,21 +1,16 @@
 package dev.matias.smartDoc.Interfaces;
 
-import dev.matias.smartDoc.Domain.Document.Document;
-import dev.matias.smartDoc.Domain.Document.DocumentService;
 import dev.matias.smartDoc.Interfaces.dto.DocumentDTO;
-import dev.matias.smartDoc.Infra.storage.AzureStorageService;
 import dev.matias.smartDoc.application.DocumentApplication;
+import dev.matias.smartDoc.application.result.DownloadResult;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.io.IOException;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,9 +18,6 @@ import java.util.UUID;
 @RequestMapping("/api/documents")
 @AllArgsConstructor
 public class DocumentController {
-
-    private final AzureStorageService storageService;
-    private final DocumentService documentService;
 
     @Autowired
     private DocumentApplication documentApplication;
@@ -39,40 +31,43 @@ public class DocumentController {
         DocumentDTO dto = documentApplication.uploadFile(file);
         return ResponseEntity.ok(dto);
     }
+
+
     @Operation(
             summary = "Delete a file from azure and DB",
             description = "You must provide the document ID to proceed with the file deletion")
     @DeleteMapping("/{id}/")
     public ResponseEntity<Void> deleteById(@PathVariable UUID id){
-        Document documentToBeDeleted = documentService.deleteDocument(id);
-        storageService.delete(documentToBeDeleted);
+        documentApplication.deleteDocument(id);
         return ResponseEntity.ok().build();
     }
+
+
     @Operation(
             summary = "Get a document by ID",
             description = "You must provide the document ID to get the document")
     @GetMapping("/{id}/")
     public ResponseEntity<DocumentDTO> getDocument(@PathVariable UUID id){
-        Document document = documentService.getDocumentById(id);
-        return ResponseEntity.ok().body(
-                new DocumentDTO(document, storageService.getMetadata(document))
-        );
+       DocumentDTO dto = documentApplication.getDocumentById(id);
+        return ResponseEntity.ok(dto);
     }
+
+
     @Operation(
             summary = "Make the download of the specified file",
             description = "You must provide the document ID to do the download of the specified document")
     @GetMapping("/download/{id}/")
     public ResponseEntity<ByteArrayResource> downloadFile(@PathVariable UUID id) {
-        Document document = documentService.getDocumentById(id);
-
-        ByteArrayResource resource = storageService.download(document);
+        DownloadResult result = documentApplication.downloadFile(id);
 
         return ResponseEntity.ok()
-                .header("Content-Disposition", "attachment; filename=\"" + document.getName() + "\"")
-                .body(resource);
+                .header("Content-Disposition", "attachment; filename=\"" + result.document().getName() + "\"")
+                .body(result.resource());
     }
+
+
     @GetMapping("/all/")
     public List<DocumentDTO> getAllDocuments(){
-        return storageService.getAllFiles();
+        return documentApplication.getAllDocuments();
     }
 }

@@ -38,4 +38,9 @@ public class Document {
     public void setBlobName() {
         this.blobName = this.id + "_" + this.name;
     }
+
+    public Document(UUID id, String name){
+        this.id = id;
+        this.name = name;
+    }
 }
