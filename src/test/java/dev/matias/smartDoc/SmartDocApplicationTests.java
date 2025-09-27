@@ -4,7 +4,6 @@ import dev.matias.smartDoc.Config.TestConfig;
 import dev.matias.smartDoc.Domain.Document.Document;
 import dev.matias.smartDoc.Infra.storage.AzureStorageService;
 import dev.matias.smartDoc.Domain.Document.DocumentService;
-import dev.matias.smartDoc.Services.RepositoriesServices;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -38,8 +37,6 @@ class SmartDocApplicationTests {
 	@Autowired
 	private AzureStorageService storageService;
 
-	@Autowired
-	private RepositoriesServices repositoriesServices;
 
 	private final UUID mockId = UUID.randomUUID();
 
