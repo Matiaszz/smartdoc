@@ -39,6 +39,14 @@ public class DocumentService {
             return DocType.PPTX;
         }
 
+        if (fileName.endsWith(".txt")){
+            return DocType.TEXT;
+        }
+
+        if (fileName.endsWith(".csv")){
+            return DocType.CSV;
+        }
+
         if (Arrays.stream(imgExtensions).anyMatch(fileName::endsWith)) {
             return DocType.IMAGE;
         }

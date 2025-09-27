@@ -30,7 +30,7 @@ async def generate_contract(contract: Contract):
     }
 
     response = requests.post(
-        'http://localhost:8080/api/documents/upload/', files=files)
+        'http://localhost:8080/api/documents/upload', files=files)
 
     print(response.status_code)
     print(response.text)
@@ -38,7 +38,7 @@ async def generate_contract(contract: Contract):
     return Response(content=pdf_bytes, media_type="application/pdf")
 
 
-@app.post("/generate-report-docx/")
+@app.post("/generate-report-docx")
 async def generate_report(report: Report):
     html_content = generate_report_html(report)
 
@@ -63,7 +63,7 @@ async def generate_report(report: Report):
         }
 
         response = requests.post(
-            'http://localhost:8080/api/documents/upload/', files=files)
+            'http://localhost:8080/api/documents/upload', files=files)
 
         print(response.status_code)
         print(response.text)

@@ -48,7 +48,7 @@ public class DocumentController {
             description = "You must provide the document ID to get the document")
     @GetMapping("/{id}")
     public ResponseEntity<DocumentDTO> getDocument(@PathVariable UUID id){
-       DocumentDTO dto = documentApplication.getDocumentById(id);
+        DocumentDTO dto = documentApplication.getDocumentById(id);
         return ResponseEntity.ok(dto);
     }
 
