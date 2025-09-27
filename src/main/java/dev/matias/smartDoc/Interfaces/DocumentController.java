@@ -25,7 +25,7 @@ public class DocumentController {
     @Operation(
             summary = "Upload a file to azure Storage",
             description = "Accepts any file with a max size of 10MB and send to cloud.")
-    @PostMapping("/upload/")
+    @PostMapping("/upload")
     public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file) {
 
         DocumentDTO dto = documentApplication.uploadFile(file);
@@ -36,7 +36,7 @@ public class DocumentController {
     @Operation(
             summary = "Delete a file from azure and DB",
             description = "You must provide the document ID to proceed with the file deletion")
-    @DeleteMapping("/{id}/")
+    @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteById(@PathVariable UUID id){
         documentApplication.deleteDocument(id);
         return ResponseEntity.ok().build();
@@ -46,7 +46,7 @@ public class DocumentController {
     @Operation(
             summary = "Get a document by ID",
             description = "You must provide the document ID to get the document")
-    @GetMapping("/{id}/")
+    @GetMapping("/{id}")
     public ResponseEntity<DocumentDTO> getDocument(@PathVariable UUID id){
        DocumentDTO dto = documentApplication.getDocumentById(id);
         return ResponseEntity.ok(dto);
@@ -56,7 +56,7 @@ public class DocumentController {
     @Operation(
             summary = "Make the download of the specified file",
             description = "You must provide the document ID to do the download of the specified document")
-    @GetMapping("/download/{id}/")
+    @GetMapping("/download/{id}")
     public ResponseEntity<ByteArrayResource> downloadFile(@PathVariable UUID id) {
         DownloadResult result = documentApplication.downloadFile(id);
 
@@ -66,7 +66,7 @@ public class DocumentController {
     }
 
 
-    @GetMapping("/all/")
+    @GetMapping("/all")
     public List<DocumentDTO> getAllDocuments(){
         return documentApplication.getAllDocuments();
     }
