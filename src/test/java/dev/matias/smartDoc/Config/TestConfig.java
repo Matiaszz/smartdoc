@@ -1,7 +1,7 @@
 package dev.matias.smartDoc.Config;
 
-import dev.matias.smartDoc.Services.AzureStorageService;
-import dev.matias.smartDoc.Services.DocumentService;
+import dev.matias.smartDoc.Infra.storage.AzureStorageService;
+import dev.matias.smartDoc.Domain.Document.DocumentService;
 import dev.matias.smartDoc.Services.RepositoriesServices;
 import org.mockito.Mockito;
 import org.springframework.boot.test.context.TestConfiguration;

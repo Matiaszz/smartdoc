@@ -1,4 +1,4 @@
-package dev.matias.smartDoc.Services;
+package dev.matias.smartDoc.Infra.storage;
 
 import com.azure.core.http.rest.PagedIterable;
 import com.azure.storage.blob.BlobClient;
@@ -8,8 +8,9 @@ import com.azure.storage.blob.BlobServiceClientBuilder;
 import com.azure.storage.blob.models.BlobItem;
 import com.azure.storage.blob.models.BlobListDetails;
 import com.azure.storage.blob.models.ListBlobsOptions;
-import dev.matias.smartDoc.DTOs.DocumentDTO;
-import dev.matias.smartDoc.Domain.Document;
+import dev.matias.smartDoc.Interfaces.dto.DocumentDTO;
+import dev.matias.smartDoc.Domain.Document.Document;
+import dev.matias.smartDoc.Domain.Document.DocumentService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,13 +28,11 @@ import java.util.stream.Collectors;
 
 @Slf4j
 @Service
-public class AzureStorageService {
+public class AzureStorageService implements DocumentStoragePort{
     private final BlobContainerClient containerClient;
 
     @Autowired
-    private RepositoriesServices repositoriesServices;
-
-
+    private DocumentService documentService;
 
     public AzureStorageService(@Value("${azure.storage.connection-string}") String connectionString,
                                @Value("${azure.storage.container-name}") String containerName){
@@ -48,7 +47,8 @@ public class AzureStorageService {
 
     }
 
-    public void uploadFile(Document document, byte[] data){
+    @Override
+    public void upload(Document document, byte[] data){
         BlobClient blobClient = getBlobClient(document);
         blobClient.upload(new ByteArrayInputStream(data), data.length, true);
 
@@ -58,7 +58,8 @@ public class AzureStorageService {
         blobClient.setMetadata(metadata);
     }
 
-    public void deleteFile(Document document){
+    @Override
+    public void delete(Document document){
         BlobClient blobClient = getBlobClient(document);
         blobClient.deleteIfExists();
     }
@@ -74,7 +75,8 @@ public class AzureStorageService {
                 .collect(Collectors.toList());
     }
 
-    public ByteArrayResource downloadFile(Document document){
+    @Override
+    public ByteArrayResource download(Document document){
         BlobClient file = containerClient.getBlobClient(document.getBlobName());
 
         byte[] fileContent = file.downloadContent().toBytes();
@@ -82,6 +84,7 @@ public class AzureStorageService {
         return new ByteArrayResource(fileContent);
     }
 
+    @Override
     public Map<String, String> getMetadata(Document document) {
         return containerClient.getBlobClient(document.getBlobName()).getProperties().getMetadata();
     }
@@ -94,7 +97,7 @@ public class AzureStorageService {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "ID not casted");
         }
 
-        return repositoriesServices.getDocumentById(documentId);
+        return documentService.getDocumentById(documentId);
     }
 
     private BlobClient getBlobClient(Document document){

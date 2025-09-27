@@ -1,4 +1,4 @@
-package dev.matias.smartDoc.Domain;
+package dev.matias.smartDoc.Domain.Document.ValueObjects;
 
 public enum DocType {
     PDF,

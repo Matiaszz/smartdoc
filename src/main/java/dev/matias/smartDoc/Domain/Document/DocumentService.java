@@ -1,19 +1,14 @@
-package dev.matias.smartDoc.Services;
+package dev.matias.smartDoc.Domain.Document;
 
 
-import dev.matias.smartDoc.DTOs.DocumentDTO;
-import dev.matias.smartDoc.Domain.DocType;
-import dev.matias.smartDoc.Domain.Document;
-import dev.matias.smartDoc.Repositories.DocumentRepository;
+import dev.matias.smartDoc.Domain.Document.ValueObjects.DocType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 import java.util.UUID;
 
 
@@ -22,16 +17,11 @@ public class DocumentService {
     @Autowired
     private DocumentRepository documentRepository;
 
-    @Autowired
-    private AzureStorageService storage;
-
-    @Autowired
-    private RepositoriesServices repositoriesServices;
-
-    public void deleteDocument(UUID id){
-        Document document = repositoriesServices.getDocumentById(id);
+    public Document deleteDocument(UUID id){
+        Document document = this.getDocumentById(id);
         documentRepository.delete(document);
-        storage.deleteFile(document);
+        return document;
+
     }
 
 
@@ -56,8 +46,9 @@ public class DocumentService {
         return DocType.OTHER;
     }
 
-    public DocumentDTO getDocumentDTO(Document document){
-        return new DocumentDTO(document, storage.getMetadata(document));
+    public Document getDocumentById(UUID documentId){
+        return documentRepository.findById(documentId).orElseThrow(
+                () -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Document ID not found."));
     }
 
     public Document prepareDocument(MultipartFile file){

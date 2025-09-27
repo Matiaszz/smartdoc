@@ -1,5 +1,6 @@
-package dev.matias.smartDoc.Domain;
+package dev.matias.smartDoc.Domain.Document;
 
+import dev.matias.smartDoc.Domain.Document.ValueObjects.DocType;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;

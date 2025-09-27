@@ -1,9 +1,9 @@
 package dev.matias.smartDoc;
 
 import dev.matias.smartDoc.Config.TestConfig;
-import dev.matias.smartDoc.Domain.Document;
-import dev.matias.smartDoc.Services.AzureStorageService;
-import dev.matias.smartDoc.Services.DocumentService;
+import dev.matias.smartDoc.Domain.Document.Document;
+import dev.matias.smartDoc.Infra.storage.AzureStorageService;
+import dev.matias.smartDoc.Domain.Document.DocumentService;
 import dev.matias.smartDoc.Services.RepositoriesServices;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,7 +61,7 @@ class SmartDocApplicationTests {
 		MockMultipartFile file = new MockMultipartFile("file", "test.pdf", "application/pdf", "dummy content".getBytes());
 		when(documentService.prepareDocument(any())).thenReturn(mockDocument);
 		doNothing().when(documentService).validateDocument(any());
-		doNothing().when(storageService).uploadFile(any(), any());
+		doNothing().when(storageService).upload(any(), any());
 
 		mockMvc.perform(multipart("/api/documents/upload/").file(file))
 				.andExpect(status().isOk())
@@ -71,14 +71,14 @@ class SmartDocApplicationTests {
 
 	@Test
 	void shouldGetADocument() throws Exception {
-		when(repositoriesServices.getDocumentById(any())).thenReturn(mockDocument);
+		when(documentService.getDocumentById(any())).thenReturn(mockDocument);
 		mockMvc.perform(get(uri)).andExpect(status().isOk());
 	}
 
 	@Test
 	void shouldDownloadAFile() throws Exception {
-		when(repositoriesServices.getDocumentById(any())).thenReturn(mockDocument);
-		when(storageService.downloadFile(any())).thenReturn(new ByteArrayResource("dummy content".getBytes()));
+		when(documentService.getDocumentById(any())).thenReturn(mockDocument);
+		when(storageService.download(any())).thenReturn(new ByteArrayResource("dummy content".getBytes()));
 
 		mockMvc.perform(get("/api/documents/download/" + mockId + "/"))
 				.andExpect(status().isOk());

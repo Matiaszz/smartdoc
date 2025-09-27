@@ -1,6 +1,5 @@
-package dev.matias.smartDoc.Repositories;
+package dev.matias.smartDoc.Domain.Document;
 
-import dev.matias.smartDoc.Domain.Document;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.UUID;

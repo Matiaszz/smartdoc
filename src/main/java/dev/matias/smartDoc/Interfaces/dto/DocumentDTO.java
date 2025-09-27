@@ -1,7 +1,7 @@
-package dev.matias.smartDoc.DTOs;
+package dev.matias.smartDoc.Interfaces.dto;
 
-import dev.matias.smartDoc.Domain.DocType;
-import dev.matias.smartDoc.Domain.Document;
+import dev.matias.smartDoc.Domain.Document.Document;
+import dev.matias.smartDoc.Domain.Document.ValueObjects.DocType;
 
 import java.time.LocalDateTime;
 import java.util.Map;

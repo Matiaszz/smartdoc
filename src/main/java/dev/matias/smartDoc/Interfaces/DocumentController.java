@@ -1,10 +1,9 @@
-package dev.matias.smartDoc.Controllers;
+package dev.matias.smartDoc.Interfaces;
 
-import dev.matias.smartDoc.DTOs.DocumentDTO;
-import dev.matias.smartDoc.Domain.Document;
-import dev.matias.smartDoc.Services.AzureStorageService;
-import dev.matias.smartDoc.Services.DocumentService;
-import dev.matias.smartDoc.Services.RepositoriesServices;
+import dev.matias.smartDoc.Domain.Document.Document;
+import dev.matias.smartDoc.Domain.Document.DocumentService;
+import dev.matias.smartDoc.Interfaces.dto.DocumentDTO;
+import dev.matias.smartDoc.Infra.storage.AzureStorageService;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
 import org.springframework.core.io.ByteArrayResource;
@@ -23,7 +22,6 @@ import java.util.UUID;
 @AllArgsConstructor
 public class DocumentController {
 
-    private final RepositoriesServices repositoriesServices;
     private final AzureStorageService storageService;
     private final DocumentService documentService;
 
@@ -33,10 +31,9 @@ public class DocumentController {
     @PostMapping("/upload/")
     public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file) {
         try {
-
             Document savedDocument = documentService.prepareDocument(file);
             documentService.validateDocument(savedDocument);
-            storageService.uploadFile(savedDocument, file.getBytes());
+            storageService.upload(savedDocument, file.getBytes());
 
             return ResponseEntity.ok().body(
                     new DocumentDTO(savedDocument, storageService.getMetadata(savedDocument)
@@ -52,7 +49,8 @@ public class DocumentController {
             description = "You must provide the document ID to proceed with the file deletion")
     @DeleteMapping("/{id}/")
     public ResponseEntity<Void> deleteById(@PathVariable UUID id){
-        documentService.deleteDocument(id);
+        Document documentToBeDeleted = documentService.deleteDocument(id);
+        storageService.delete(documentToBeDeleted);
         return ResponseEntity.ok().build();
     }
     @Operation(
@@ -60,7 +58,7 @@ public class DocumentController {
             description = "You must provide the document ID to get the document")
     @GetMapping("/{id}/")
     public ResponseEntity<DocumentDTO> getDocument(@PathVariable UUID id){
-        Document document = repositoriesServices.getDocumentById(id);
+        Document document = documentService.getDocumentById(id);
         return ResponseEntity.ok().body(
                 new DocumentDTO(document, storageService.getMetadata(document))
         );
@@ -70,9 +68,9 @@ public class DocumentController {
             description = "You must provide the document ID to do the download of the specified document")
     @GetMapping("/download/{id}/")
     public ResponseEntity<ByteArrayResource> downloadFile(@PathVariable UUID id) {
-        Document document = repositoriesServices.getDocumentById(id);
+        Document document = documentService.getDocumentById(id);
 
-        ByteArrayResource resource = storageService.downloadFile(document);
+        ByteArrayResource resource = storageService.download(document);
 
         return ResponseEntity.ok()
                 .header("Content-Disposition", "attachment; filename=\"" + document.getName() + "\"")
