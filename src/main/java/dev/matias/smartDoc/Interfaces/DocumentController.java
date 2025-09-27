@@ -4,8 +4,10 @@ import dev.matias.smartDoc.Domain.Document.Document;
 import dev.matias.smartDoc.Domain.Document.DocumentService;
 import dev.matias.smartDoc.Interfaces.dto.DocumentDTO;
 import dev.matias.smartDoc.Infra.storage.AzureStorageService;
+import dev.matias.smartDoc.application.DocumentApplication;
 import io.swagger.v3.oas.annotations.Operation;
 import lombok.AllArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,24 +27,17 @@ public class DocumentController {
     private final AzureStorageService storageService;
     private final DocumentService documentService;
 
+    @Autowired
+    private DocumentApplication documentApplication;
+
     @Operation(
             summary = "Upload a file to azure Storage",
             description = "Accepts any file with a max size of 10MB and send to cloud.")
     @PostMapping("/upload/")
     public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file) {
-        try {
-            Document savedDocument = documentService.prepareDocument(file);
-            documentService.validateDocument(savedDocument);
-            storageService.upload(savedDocument, file.getBytes());
 
-            return ResponseEntity.ok().body(
-                    new DocumentDTO(savedDocument, storageService.getMetadata(savedDocument)
-                    )
-            );
-
-        } catch (IOException e) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Error on file processing: %s", e);
-        }
+        DocumentDTO dto = documentApplication.uploadFile(file);
+        return ResponseEntity.ok(dto);
     }
     @Operation(
             summary = "Delete a file from azure and DB",
