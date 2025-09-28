@@ -1,6 +1,7 @@
 package dev.matias.smartDoc.Domain.User;
 
 import dev.matias.smartDoc.Domain.User.ValueObjects.UserRole;
+import dev.matias.smartDoc.Interfaces.dto.user.RegisterUserDTO;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -52,6 +53,14 @@ public class User implements UserDetails {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
+    public User(RegisterUserDTO data, UserRole role){
+        this.username = data.username();
+        this.name = data.name();
+        this.email = data.email();
+        this.password = data.password();
+        this.role = role;
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return this.role.getPermissions().stream()
@@ -73,4 +82,6 @@ public class User implements UserDetails {
     public boolean isEnabled() {
         return this.enabled;
     }
+
+
 }

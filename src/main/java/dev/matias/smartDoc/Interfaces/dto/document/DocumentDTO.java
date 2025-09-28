@@ -1,4 +1,4 @@
-package dev.matias.smartDoc.Interfaces.dto;
+package dev.matias.smartDoc.Interfaces.dto.document;
 
 import dev.matias.smartDoc.Domain.Document.Document;
 import dev.matias.smartDoc.Domain.Document.ValueObjects.DocType;

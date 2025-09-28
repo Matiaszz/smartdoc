@@ -1,6 +1,6 @@
 package dev.matias.smartDoc.Interfaces;
 
-import dev.matias.smartDoc.Interfaces.dto.DocumentDTO;
+import dev.matias.smartDoc.Interfaces.dto.document.DocumentDTO;
 import dev.matias.smartDoc.application.DocumentApplication;
 import dev.matias.smartDoc.application.result.DownloadResult;
 import io.swagger.v3.oas.annotations.Operation;

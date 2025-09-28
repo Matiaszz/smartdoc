@@ -8,7 +8,7 @@ import com.azure.storage.blob.BlobServiceClientBuilder;
 import com.azure.storage.blob.models.BlobItem;
 import com.azure.storage.blob.models.BlobListDetails;
 import com.azure.storage.blob.models.ListBlobsOptions;
-import dev.matias.smartDoc.Interfaces.dto.DocumentDTO;
+import dev.matias.smartDoc.Interfaces.dto.document.DocumentDTO;
 import dev.matias.smartDoc.Domain.Document.Document;
 import dev.matias.smartDoc.Domain.Document.DocumentService;
 import lombok.extern.slf4j.Slf4j;

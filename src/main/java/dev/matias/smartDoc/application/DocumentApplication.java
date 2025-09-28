@@ -3,7 +3,7 @@ package dev.matias.smartDoc.application;
 import dev.matias.smartDoc.Domain.Document.Document;
 import dev.matias.smartDoc.Domain.Document.DocumentService;
 import dev.matias.smartDoc.Infra.storage.AzureStorageService;
-import dev.matias.smartDoc.Interfaces.dto.DocumentDTO;
+import dev.matias.smartDoc.Interfaces.dto.document.DocumentDTO;
 import dev.matias.smartDoc.application.result.DownloadResult;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -24,8 +24,6 @@ public class DocumentApplication {
     private AzureStorageService storageService;
 
     public DocumentDTO uploadFile(MultipartFile file){
-
-
         try {
             Document savedDocument = documentService.prepareDocument(file);
             documentService.validateDocument(savedDocument);
