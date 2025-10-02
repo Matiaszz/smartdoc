@@ -5,6 +5,7 @@ import dev.matias.smartDoc.Domain.User.UserRepository;
 import dev.matias.smartDoc.Domain.User.ValueObjects.UserRole;
 import dev.matias.smartDoc.Interfaces.dto.user.RegisterUserDTO;
 import dev.matias.smartDoc.Interfaces.dto.user.UserLoginDTO;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -15,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
+@Slf4j
 @Service
 public class AuthService {
 
@@ -41,16 +43,25 @@ public class AuthService {
     public User login(UserLoginDTO data){
 
         User existingUser = userRepository.findByEmail(data.email()).orElseThrow(
-                () -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Wrong Email or Password 11111")
+                () -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Wrong Email or Password")
         );
 
         boolean passwordMatches = passwordEncoder.matches(data.password(), existingUser.getPassword());
 
-        if (!passwordMatches) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Wrong Email or Password 2222222");
+        if (!passwordMatches) throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Wrong Email or Password");
 
 
         var auth = new UsernamePasswordAuthenticationToken(existingUser, null);
         SecurityContextHolder.getContext().setAuthentication(auth);
         return (User) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    }
+
+    public User getMe() {
+        var auth = SecurityContextHolder.getContext().getAuthentication();
+
+        if (auth == null || !auth.isAuthenticated()) {
+            return null;
+        }
+        return (User) auth.getPrincipal();
     }
 }

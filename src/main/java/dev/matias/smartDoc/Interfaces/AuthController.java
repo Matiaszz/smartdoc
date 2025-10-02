@@ -10,14 +10,13 @@ import dev.matias.smartDoc.application.cookie.CookieService;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
+@Slf4j
 @RestController
 @Data
 @AllArgsConstructor
@@ -37,10 +36,17 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-        public ResponseEntity<?> login(@RequestBody @Valid UserLoginDTO data){
+    public ResponseEntity<?> login(@RequestBody @Valid UserLoginDTO data){
         String token = authApplication.loginToken(data);
         ResponseCookie cookie = cookieService.createCookie(token, "userToken", new CookieOptions());
         return ResponseEntity.ok().header("Set-Cookie", cookie.toString()).build();
+    }
+
+    @GetMapping("/me")
+    public ResponseEntity<UserDTO> getMe(){
+        UserDTO dto = authApplication.getMe();
+        log.warn("/ME: {}", dto);
+        return ResponseEntity.ok(dto);
     }
 
 

@@ -29,4 +29,12 @@ public class AuthApplication {
         return new UserDTO(user);
     }
 
+    public UserDTO getMe(){
+        User user = authService.getMe();
+        if (user == null) {
+            return null;
+        }
+        return new UserDTO(user);
+    }
+
 }

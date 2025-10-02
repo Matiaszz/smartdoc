@@ -38,13 +38,13 @@ public class SecurityFilter extends OncePerRequestFilter {
         }
 
         try {
-            UUID id = UUID.fromString(token);
+            UUID id = UUID.fromString(jwtService.extractSubject(token));
             UserDetails user = userRepository.findById(id).orElseThrow(
                     () -> new ResponseStatusException(
                             HttpStatus.NOT_FOUND, "User not found (Security Filter)")
             );
 
-            var authentication = new UsernamePasswordAuthenticationToken(user, null);
+            var authentication = new UsernamePasswordAuthenticationToken(user, null, user.getAuthorities());
             log.info("Authenticated user: {}", user.getUsername());
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
@@ -68,6 +68,4 @@ public class SecurityFilter extends OncePerRequestFilter {
         log.info("User Token in token recovery is null.");
         return null;
     }
-
-
 }
